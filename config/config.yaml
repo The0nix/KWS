@@ -1,0 +1,71 @@
+common:
+  seed: 1337
+data:
+  root: "data/speech_commands"
+  version: "speech_commands_v0.01"
+  keywords: ["sheila", "marvin"]
+  sample_rate: 16000
+  train_size: 0.95
+preprocessing:
+  f_min: 0
+  f_max: 8000
+  n_fft: 400  # 25 ms
+  hop_length: 160  # 10 ms
+  n_mels: 40
+model:
+  cnn_channels: 16
+  cnn_kernel_size: 51
+  gru_hidden_size: 64
+  attention_hidden_size: 64
+optimizer:
+  lr: 1e-3
+training:
+  gpus: 1
+  n_epochs: 100
+  num_workers: 6
+  batch_size: 512
+  epoch_size: 60000  # Number of samples in epoch (I use WeightedRandomSampler with replacement=True)
+wandb:
+  project: "Tamerlan-Tabolov-KWS"
+  log_freq: 3
+train_transforms:
+  - _target_: core.transforms.ToNumpy
+  - _target_: core.transforms.Squeeze
+  - _target_: audiomentations.AddGaussianNoise
+    min_amplitude: 0.001
+    max_amplitude: 0.015
+    p: 0.5
+  - _target_: audiomentations.TimeStretch
+    min_rate: 0.8
+    max_rate: 1.25
+    p: 0.5
+  - _target_: audiomentations.PitchShift
+    min_semitones: -4
+    max_semitones: 4
+    p: 0.5
+  - _target_: audiomentations.Shift
+    min_fraction: -0.5
+    max_fraction: 0.5
+    p: 0.5
+  - _target_: core.transforms.MelSpectrogram
+    sample_rate: ${data.sample_rate}
+    f_min: ${preprocessing.f_min}
+    f_max: ${preprocessing.f_max}
+    n_fft: ${preprocessing.n_fft}
+    n_mels: ${preprocessing.n_mels}
+    hop_length: ${preprocessing.hop_length}
+  - _target_: core.transforms.LogTransform
+inference_transforms:
+  - _target_: core.transforms.MelSpectrogram
+    sample_rate: ${data.sample_rate}
+    f_min: ${preprocessing.f_min}
+    f_max: ${preprocessing.f_max}
+    n_fft: ${preprocessing.n_fft}
+    n_mels: ${preprocessing.n_mels}
+    hop_length: ${preprocessing.hop_length}
+  - _target_: core.transforms.LogTransform
+inference:
+  window_size: 100  # 100 * 160 ms
+  device: "gpu"
+  checkpoint_path: ???
+  audio_path: ???
