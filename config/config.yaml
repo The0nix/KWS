@@ -22,7 +22,7 @@ optimizer:
 training:
   gpus: 1
   n_epochs: 100
-  num_workers: 6
+  num_workers: 12
   batch_size: 512
   epoch_size: 60000  # Number of samples in epoch (I use WeightedRandomSampler with replacement=True)
 wandb:
