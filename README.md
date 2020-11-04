@@ -1,5 +1,5 @@
-# QuartzNet
-Implementation of [KWS model](https://arxiv.org/abs/1803.10916) in PyTorch
+# Attention-based KWS
+Implementation of [Attention-based KWS model](https://arxiv.org/abs/1803.10916) in PyTorch
 
 ## Usage
 
